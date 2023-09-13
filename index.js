@@ -1,11 +1,11 @@
-import express from 'express';
+const express = require('express');
 const app = express();
-import cors from 'cors';
+const cors = require('cors');
 
 app.use(cors({ optionsSuccessStatus: 200 }));
 
 // Servir el archivo HTML desde el mismo directorio que app.js
-app.use(expressStatic(__dirname));
+app.use(express.static(__dirname));
 
 app.get('/timestamp', (req, res) => {
   const currentTimestamp = new Date();
@@ -13,8 +13,11 @@ app.get('/timestamp', (req, res) => {
 
   res.json({utc: utcTimestamp });
 });
-// Handle API endpoint for converting a date string to Unix timestamp and UTC format
-app.get('/api/:date?', (req, res) => {
+
+// Endpoint for the course test
+const isInvalidDate = (date) => date.toUTCString() === "Invalid Date"
+
+app.get("/api/:date", function(req, res){
   const { date } = req.params;
   if (!date) {
     // If date is empty, return the current time
@@ -45,6 +48,14 @@ app.get('/api/:date?', (req, res) => {
 });
 
 
+app.get("/api/", function(req,res){
+  res.json({
+    unix: new Date().getTime(),
+    utc: new Date().toUTCString()
+  })
+});
+
+// Just bring up the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
